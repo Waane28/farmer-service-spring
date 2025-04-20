@@ -1,0 +1,42 @@
+package api.endpoint.farmer_services.model;
+
+
+import api.endpoint.farmer_services.enums.DemandLevel;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table( name = "market_data")
+public class MarketData {
+    @Id
+    @GeneratedValue( strategy = GenerationType.IDENTITY)
+    private Integer marketId;
+
+    @ManyToOne
+    @JoinColumn( name = "crop_type_id", nullable = false)
+    private CropType cropType;
+
+    @Column( name = "price")
+    private Double price;
+
+    @Enumerated(EnumType.STRING)
+    @Column( name = "demand_level")
+    private DemandLevel demandLevel;
+
+    @Column( name = "currency")
+    private String currency;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+}

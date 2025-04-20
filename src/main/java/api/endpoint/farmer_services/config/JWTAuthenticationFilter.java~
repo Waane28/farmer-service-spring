@@ -1,0 +1,16 @@
+package api.endpoint.farmer_services.config;
+
+import api.endpoint.farmer_services.services.UserService;
+import api.endpoint.farmer_services.utils.JWTutils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+@Component
+@RequiredArgsConstructor
+public class JWTAuthenticationFilter extends OncePerRequestFilter {
+    private final JWTutils jwTutils;
+    private final UserService userService;
+
+
+}

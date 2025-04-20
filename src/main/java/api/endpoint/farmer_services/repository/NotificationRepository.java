@@ -1,0 +1,6 @@
+package api.endpoint.farmer_services.repository;
+
+import api.endpoint.farmer_services.model.Notifications;
+
+public interface NotificationRepository extends BaseRepository<Notifications, Long> {
+}

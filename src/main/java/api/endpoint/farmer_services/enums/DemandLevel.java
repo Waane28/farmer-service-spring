@@ -1,0 +1,7 @@
+package api.endpoint.farmer_services.enums;
+
+public enum DemandLevel {
+    LOW,
+    MEDIUM,
+    HIGH
+}

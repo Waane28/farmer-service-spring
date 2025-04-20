@@ -1,0 +1,6 @@
+package api.endpoint.farmer_services.enums;
+
+public enum NotificationStatus {
+    UNREAD,
+    READ
+}

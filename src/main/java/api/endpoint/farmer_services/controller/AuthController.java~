@@ -1,0 +1,99 @@
+package api.endpoint.farmer_services.controller;
+
+import api.endpoint.farmer_services.dto.AuthenticationRequest;
+import api.endpoint.farmer_services.dto.AuthenticationResponse;
+import api.endpoint.farmer_services.dto.SignupRequest;
+import api.endpoint.farmer_services.dto.UserDto;
+import api.endpoint.farmer_services.enums.UserRole;
+import api.endpoint.farmer_services.model.Users;
+import api.endpoint.farmer_services.repository.UserRepository;
+import api.endpoint.farmer_services.services.AuthService;
+import api.endpoint.farmer_services.services.UserService;
+import api.endpoint.farmer_services.utils.JWTutils;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+import java.util.UUID;
+
+@CrossOrigin
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1.0/auth")
+public class AuthController {
+    private final AuthService authService;
+    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
+    private final JWTutils jwTutils;
+    private final UserRepository userRepository;
+
+    @PostConstruct
+    public void createAdminAccount() {
+        Users adminAccount = userRepository.findByUserRole(UserRole.ADMIN);
+        if (adminAccount == null) {
+            Users newadminAccount = new Users();
+            newadminAccount.setUsername("Default Admin");
+            newadminAccount.setFullName("Null");
+            newadminAccount.setVillage("NULL");
+            newadminAccount.setEmail("ghostadmin12@gmail.com");
+            newadminAccount.setPassword(new BCryptPasswordEncoder().encode("admin123"));
+            newadminAccount.setUserRole(UserRole.ADMIN);
+            userRepository.save(newadminAccount);
+            System.out.println("Admin account created successfully");
+        }
+    }
+    @PostMapping("/signup")
+    public ResponseEntity<?> signupuser(@RequestBody SignupRequest signupRequest){
+        if (authService.hasUserWithEmail(signupRequest.getEmail()))
+            return new ResponseEntity<>("User with the same email already exist.", HttpStatus.NOT_ACCEPTABLE);
+        UserDto createdUserDto = authService.createUser(signupRequest);
+        if ( createdUserDto == null )return new ResponseEntity<>
+                ("User not created, come again later", HttpStatus.BAD_REQUEST);
+
+        return  new ResponseEntity<>(createdUserDto, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public AuthenticationResponse createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest)  throws
+            BadCredentialsException,
+            DisabledException,
+            UsernameNotFoundException {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                            authenticationRequest.getEmail(),
+                            authenticationRequest.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            throw new BadCredentialsException("Incorrect username or password");
+        }
+        final UserDetails userDetails = userService.userDetailService().loadUserByUsername(authenticationRequest.getEmail());
+        Optional<Users> optionalUser = userRepository.findFirstByEmail(userDetails.getUsername());
+        final String jwt = jwTutils.generateToken(userDetails);
+
+        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+        if (optionalUser.isPresent()) {
+            Users user = optionalUser.get();
+
+            // Set all fields explicitly
+            authenticationResponse.setJwt(jwt);
+            authenticationResponse.setId(Long.valueOf(user.getId()));
+            authenticationResponse.setUserRole(user.getUserRole());
+            authenticationResponse.setFullName(user.getFullName());
+            authenticationResponse.setEmail(user.getEmail());
+            authenticationResponse.setVillage(user.getVillage());
+        }
+        return authenticationResponse;
+
+    }
+}

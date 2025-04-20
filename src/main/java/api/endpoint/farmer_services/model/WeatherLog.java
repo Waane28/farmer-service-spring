@@ -1,0 +1,32 @@
+package api.endpoint.farmer_services.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+
+@Data
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Table( name = "weather_logs")
+public class WeatherLog {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "village")
+    private String village;
+
+    @Column(columnDefinition = "jsonb")
+    private String forecastData; // Store JSON as string
+
+    @Column( name = "temperature")
+    private Double temperature;
+
+    @CreationTimestamp
+    private LocalDateTime recordAt;
+}

@@ -1,0 +1,4 @@
+package api.endpoint.farmer_services.services;
+
+public class UserJwtService {
+}

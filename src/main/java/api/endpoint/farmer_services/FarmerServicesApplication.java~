@@ -1,0 +1,34 @@
+package api.endpoint.farmer_services;
+
+import api.endpoint.farmer_services.model.Users;
+import api.endpoint.farmer_services.repository.UserRespository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class FarmerServicesApplication implements CommandLineRunner {
+
+	@Autowired
+	private UserRespository userRespository;
+	public static void main(String[] args) {
+
+		SpringApplication.run(FarmerServicesApplication.class, args);
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+		// Create default admin if not exists
+		if (!userRespository.existsByEmail("admin@kapisha.com")) {
+			Users admin = new Users();
+			admin.setEmail("admin@kapisha.com");
+			admin.setPasswordHash(passwordEncoder.encode("admin123"));
+			admin.setFullName("Admin User");
+			admin.setRole(Users.UserRole.ADMIN);
+			admin.setVillage("Kapisha");
+			userRespository.save(admin);
+		}
+	}
+
+}

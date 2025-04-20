@@ -1,0 +1,13 @@
+package api.endpoint.farmer_services.repository;
+
+import api.endpoint.farmer_services.enums.UserRole;
+import api.endpoint.farmer_services.model.Users;
+
+import java.util.Optional;
+
+public interface UserRepository extends BaseRepository<Users, Integer> {
+    Optional<Users> findFirstByEmail(String email);
+    Users findByUserRole(UserRole userRole); // Corrected method name
+}
+
+
