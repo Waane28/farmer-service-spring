@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class CropRequest {
-    private CropType cropType;
+    private String cropName;
     private String description;
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class MarketDataRequest {
-    private CropType cropType;
+    private String cropName;
     private Double price;
     private DemandLevel demandLevel;
     private String currency;

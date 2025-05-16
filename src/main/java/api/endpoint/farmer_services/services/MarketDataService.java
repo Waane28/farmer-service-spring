@@ -1,7 +1,11 @@
 package api.endpoint.farmer_services.services;
 
 
+import api.endpoint.farmer_services.dto.MarketDataRequest;
+import api.endpoint.farmer_services.model.Crop;
+import api.endpoint.farmer_services.model.CropType;
 import api.endpoint.farmer_services.model.MarketData;
+import api.endpoint.farmer_services.repository.CropTypeRepository;
 import api.endpoint.farmer_services.repository.MarketDataRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,8 +18,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MarketDataService {
     private final MarketDataRepository marketDataRepository;
+    private final CropTypeRepository cropTypeRepository;
 
-    public MarketData createMarketData(MarketData marketData) {
+    public MarketData createMarketData(MarketDataRequest request) {
+        CropType cropType = cropTypeRepository.findByName(request.getCropName())
+                .orElseThrow(() -> new RuntimeException("CropType not found: " + request.getCropName()));
+        MarketData marketData = new MarketData();
+        marketData.setCropType(cropType);
+        marketData.setPrice(request.getPrice());
+        marketData.setDemandLevel(request.getDemandLevel());
+        marketData.setCurrency(request.getCurrency());
         return marketDataRepository.save(marketData);
     }
 

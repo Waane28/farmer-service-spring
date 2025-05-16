@@ -1,10 +1,7 @@
 package api.endpoint.farmer_services.controller;
 
-import api.endpoint.farmer_services.dto.CropResponse;
-import api.endpoint.farmer_services.dto.CropTypeResponse;
 import api.endpoint.farmer_services.dto.MarketDataRequest;
 import api.endpoint.farmer_services.dto.MarketDataResponse;
-import api.endpoint.farmer_services.model.Crop;
 import api.endpoint.farmer_services.model.MarketData;
 import api.endpoint.farmer_services.repository.MarketDataRepository;
 import api.endpoint.farmer_services.services.MarketDataService;
@@ -30,9 +27,9 @@ public class MarketDataController {
 
     @PostMapping
     public ResponseEntity<MarketDataResponse> createMarketData(@Valid @RequestBody MarketDataRequest marketDataRequest) {
-        MarketData marketData = modelMapper.map(marketDataRequest, MarketData.class);
-        MarketData createMarketData = marketDataService.createMarketData(marketData);
-        return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(createMarketData, MarketDataResponse.class));
+        MarketData createdMarketData = marketDataService.createMarketData(marketDataRequest);
+        MarketDataResponse response = modelMapper.map(createdMarketData, MarketDataResponse.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
@@ -49,10 +46,21 @@ public class MarketDataController {
         return ResponseEntity.ok(modelMapper.map(marketData, MarketDataResponse.class));
     }
 
+    @GetMapping("/summary") // Updated path
+    public Map<String, Long> getMarketDataSummary() {
+        long totalPriceIncreased = marketDataRepository.countByPriceGreaterThan(50.0);
+        long totalPriceDecreased = marketDataRepository.countByPriceLessThan(-50.0);
+
+        return Map.of(
+                "total_price_increased", totalPriceIncreased,
+                "total_price_decreased", totalPriceDecreased
+        );
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<MarketDataResponse> updateMarketData(@Valid @RequestBody MarketDataRequest marketDataRequest) {
-        MarketData marketData = modelMapper.map(marketDataRequest, MarketData.class);
-        MarketData updateMarketData = marketDataService.updateMarketData(marketData.getId(), marketData);
+    public ResponseEntity<MarketDataResponse> updateMarketData(@PathVariable Long id, @Valid @RequestBody MarketDataRequest marketDataRequest) {
+        MarketData marketDataDetails = modelMapper.map(marketDataRequest, MarketData.class);
+        MarketData updateMarketData = marketDataService.updateMarketData(id, marketDataDetails);
         return ResponseEntity.ok(modelMapper.map(updateMarketData, MarketDataResponse.class));
     }
 
@@ -62,6 +70,8 @@ public class MarketDataController {
         return ResponseEntity.noContent().build();
     }
 
+
+
     @GetMapping("/pagination")
     public ResponseEntity<Map<String, Object>> getAllMarketDataPaginated(
             @RequestParam(defaultValue = "0") int page,
@@ -69,9 +79,9 @@ public class MarketDataController {
 
         Page<MarketData> pageMarketDatas = marketDataService.getAllMarketDataPaginated(page, size);
 
-        List<CropTypeResponse> response = pageMarketDatas.getContent()
+        List<MarketDataResponse> response = pageMarketDatas.getContent()
                 .stream()
-                .map(cropType -> modelMapper.map(cropType, CropTypeResponse.class))
+                .map(marketData -> modelMapper.map(marketData, MarketDataResponse.class))
                 .toList();
 
         Map<String, Object> responseBody = new HashMap<>();

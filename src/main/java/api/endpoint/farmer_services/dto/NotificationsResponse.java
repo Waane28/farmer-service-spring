@@ -1,7 +1,6 @@
 package api.endpoint.farmer_services.dto;
 
 import api.endpoint.farmer_services.enums.NotificationStatus;
-import api.endpoint.farmer_services.model.Users;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +14,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class NotificationsResponse {
     private Long id;
-    private Users users;
     private NotificationStatus notificationStatus;
     private LocalDateTime createdAt;
 }

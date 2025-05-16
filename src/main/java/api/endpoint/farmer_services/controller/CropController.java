@@ -28,10 +28,10 @@ public class CropController {
     private final ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<CropResponse> createCrop(@Valid @RequestBody CropRequest cropRequest){
-        Crop crop = modelMapper.map(cropRequest, Crop.class);
-        Crop createCrop = cropService.createCrop(crop);
-        return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(crop, CropResponse.class));
+    public ResponseEntity<CropResponse> createCrop(@Valid @RequestBody CropRequest cropRequest) {
+        Crop createdCrop = cropService.createCrop(cropRequest);
+        CropResponse response = modelMapper.map(createdCrop, CropResponse.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
@@ -70,15 +70,15 @@ public class CropController {
     }
 
     @GetMapping("/all-crops-by-pagination")// Pagination
-    public ResponseEntity<Map<String, Object>> getAllMarketDataPaginated(
+    public ResponseEntity<Map<String, Object>> getAllCropsByPaginated(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         Page<Crop> pageCrops = cropService.getAllCropsByPaginated(page, size);
 
-        List<CropTypeResponse> response = pageCrops.getContent()
+        List<CropResponse> response = pageCrops.getContent()
                 .stream()
-                .map(cropType -> modelMapper.map(cropType, CropTypeResponse.class))
+                .map(crop -> modelMapper.map(crop, CropResponse.class))
                 .toList();
 
         Map<String, Object> responseBody = new HashMap<>();

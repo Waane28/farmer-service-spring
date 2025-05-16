@@ -15,9 +15,9 @@ public class Notifications {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @ManyToOne
-//    @JoinColumn( name = "user_id")
-//    private Users users;
+    @ManyToOne
+    @JoinColumn( name = "user_id")
+    private Users users;
 
     @Enumerated(EnumType.STRING)
     @Column( name = "message_type")

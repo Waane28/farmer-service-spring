@@ -1,7 +1,10 @@
 package api.endpoint.farmer_services.services;
 
+import api.endpoint.farmer_services.dto.CropRequest;
 import api.endpoint.farmer_services.model.Crop;
+import api.endpoint.farmer_services.model.CropType;
 import api.endpoint.farmer_services.repository.CropRepository;
+import api.endpoint.farmer_services.repository.CropTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,8 +16,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CropService {
     private final CropRepository cropRepository;
+    private final CropTypeRepository cropTypeRepository;
 
-    public Crop createCrop(Crop crop) {
+    public Crop createCrop(CropRequest request) { // Keep parameter as CropRequest
+        CropType cropType = cropTypeRepository.findByName(request.getCropName())
+                .orElseThrow(() -> new RuntimeException("CropType not found: " + request.getCropName()));
+        Crop crop = new Crop();
+        crop.setCropType(cropType);
+        crop.setDescription(request.getDescription());
         return cropRepository.save(crop);
     }
 

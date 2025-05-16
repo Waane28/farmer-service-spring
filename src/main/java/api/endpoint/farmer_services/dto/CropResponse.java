@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class CropResponse {
     private Long id;
-    private CropType cropType;
+    private String cropName;
     private String description;
     private LocalDateTime plantingDate;
-    private LocalDateTime haverstingDate;
+    private LocalDateTime harvestingDate;
 }

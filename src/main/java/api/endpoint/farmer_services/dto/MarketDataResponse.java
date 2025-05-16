@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class MarketDataResponse {
     private Long id;
-    private CropType cropType;
+    private String cropName;
     private Double price;
     private DemandLevel demandLevel;
     private String currency;
